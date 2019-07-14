@@ -1,3 +1,6 @@
+import csv
+import os
+
 def permutations(classes):
     perms = []
     if len(classes)==0:
@@ -49,6 +52,19 @@ def scheduleHelper(students, classSchedule, times):
     #for activity in students[student]:
     #        assignments[student][activity] = time
 
+
+def load_students(input_filename):
+    students = {}
+    filepath = os.path.abspath(input_filename)
+    with open(filepath, 'rt') as form_responses_csv:
+        reader = csv.DictReader(form_responses_csv)
+        for row in reader:
+            students[(row['Name'],row['Year'])]=[
+                        row['First Choice'],
+                        row['Second Choice'],
+                        row['Third Choice'] ]
+    return students
+
 students = {"a":["art","dance","fencing"],"b":["art","dance","fencing"],"c":["art","dance","fencing"],"d":["art","dance","fencing"]}
 classes = {"art":1,"dance":1,"fencing":1}
 times = [9,12,3]
@@ -56,5 +72,10 @@ times = [9,12,3]
 
 expected = {"a":{"art":9,"dance":12,"fencing":3}}
 
-print(permutations(["art","dance","fencing"]))
-print(scheduleHelper(students,makeClassSchedule(classes,times),times))
+#print(permutations(["art","dance","fencing"]))
+#print(scheduleHelper(students,makeClassSchedule(classes,times),times))
+
+if __name__=='__main__':
+    input_filename = "student_preferences.csv"
+    students = load_students(input_filename)
+    print(scheduleHelper(students,makeClassSchedule(classes,times),times))
