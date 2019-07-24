@@ -82,24 +82,18 @@ def load_students(input_filename):
 
 ### writing the output csv
 def save_assignments(students, output_filename,times):
-    with open(output_filename, 'wt') as output_file:
-        fieldnames = ["Name","Year","Block 1", "Block 2", "Block 3"]
-        writer = csv.DictWriter(output_file, fieldnames=fieldnames)
-        writer.writeheader()
+    with open(output_filename, 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile, delimiter=' ',
+                            quotechar=' ', quoting=csv.QUOTE_MINIMAL)
+        writer.writerow("Name,Year,Block 1,Block 2,Block 3")
         for student in students: 
-            writer.writerow({
-                "Name": student[0], 
-                "Year": student[1], 
-                "Block 1": students[student][times[0]],
-                "Block 2": students[student][times[1]],
-                "Block 3": students[student][times[2]]
-            })
+            writer.writerow(student[0]+","+ student[1]+","+   students[student][times[0]]+","+ students[student][times[1]]+","+  students[student][times[2]])
 
 if __name__=='__main__':
     input_filename = "student_prefs.csv"
     times = [9,12,3]
     students = load_students(input_filename) #
-    limit = 1
+    limit = 2
     classes = {}
     for student in students:
         for activity in students[student]:
