@@ -73,10 +73,7 @@ def load_students(input_filename):
     with open(filepath, 'rt') as form_responses_csv:
         reader = csv.DictReader(form_responses_csv)
         for row in reader:
-            students[(row['Name'],row['Year'])]=[
-                        row['First Choice'],
-                        row['Second Choice'],
-                        row['Third Choice'] ]
+            students[(row['Name'],row['Year'])]=  ["Bhangra" if "Bhangra" in i else i.strip() for i in row['Please tick 3 boxes!'].split(",")]
     return students
 
 
@@ -93,15 +90,33 @@ if __name__=='__main__':
     input_filename = "student_prefs.csv"
     times = [9,12,3]
     students = load_students(input_filename) #
-    limit = 2
+    limit = 29
     classes = {}
+    total_count = {}
     for student in students:
         for activity in students[student]:
             classes[activity] = limit
-    print(classes)
-    assignments = scheduleHelper(students,makeClassSchedule(classes,times),times)
-    print(assignments)
+            if activity in total_count:
+                total_count[activity] += 1
+            else:
+                total_count[activity] = 1
+    print(total_count)
+    #print(classes)
+    classSchedule = makeClassSchedule(classes,times)
+    #classSchedule[('Bhangra',9)] = 0
+    #classSchedule[('Bhangra',3)] = 0
+    classSchedule[('Product Management - Guest Lecture by Gil Hirsch',9)] = 0
+    classSchedule[('Product Management - Guest Lecture by Gil Hirsch',12)] = 0
+    classSchedule[('Product Management - Guest Lecture by Gil Hirsch',9)] = 0
+    classSchedule[('Local Girl Goes Global - Guest Lecture by Idit Harel',3)] = 0
+    classSchedule[('Creativity - a taste of thinking beyond',3)] = 0
+    classSchedule[('Creativity - a taste of thinking beyond',12)] = 0 
+    assignments = scheduleHelper(students,classSchedule,times)
+    print("+++++++++++++++++++=")
+    #rint(classSchedule)
+    print([i[0]+","+str(i[1])+": "+str(limit-classSchedule[i]) for i in classSchedule])
     if assignments != None:
         save_assignments(assignments,"meetConfAssignments.csv",times)
+
     else:
         print("impossible")
