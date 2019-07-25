@@ -30,20 +30,22 @@ def makeClassSchedule(classes,times):
 Function to try assigning a student to a permutation of their class schedule, and then recursively attempt solving the rest of the schedule
 '''
 
-def scheduleHelper(students, classSchedule, times):
+def scheduleHelper(students, classSchedule, times, tops = []):
     global num_calls
     assignments = {}
     #print("assign",students)
+    
     if len(students)==0:
         return assignments
     student = list(students.keys())[0]
-    #try each possible permutations of activities and times
 
+    #try each possible permutations of activities and times
+    if(student in tops):
+        print(student)
     num_calls+=1
     for perm in permutations(students[student]):
-        #print(perm)
-        if student == ('Tal Herman', 'Y2'):
-            print(perm)
+        #print(student,perm)
+        #print("spots",classSchedule)
         validPerm = True
         for index, activity in enumerate(perm):
             if classSchedule[(activity,times[index])] == 0:
@@ -57,8 +59,9 @@ def scheduleHelper(students, classSchedule, times):
         if not validPerm:
             continue
 
-        classList = students.pop(student) #remove the assigned class
-        childAssign = scheduleHelper(students, classSchedule, times)
+        classList = students.pop(student) #remove the assigned , save it for later
+        
+        childAssign = scheduleHelper(students, classSchedule.copy(), times, tops)
         #print("child:",childAssign)
         #if the recursive call succeeded, then we have a solution to return
         if childAssign != None:
@@ -97,7 +100,7 @@ if __name__=='__main__':
     input_filename = "meetConf2019.csv"
     times = [9,12,3]
     students = load_students(input_filename) #
-    limit = 25
+    limit = 30
     classes = {}
     total_count = {}
     for student in students:
@@ -113,19 +116,35 @@ if __name__=='__main__':
     num_calls = 0
     classSchedule = makeClassSchedule(classes,times)
     
-    classSchedule[('Bhangra',9)] = 2
+    classSchedule[('Bhangra',9)] = 0
     classSchedule[('Bhangra',3)] = 2
     classSchedule[('Product Management - Guest Lecture by Gil Hirsch',9)] = 0
     classSchedule[('Product Management - Guest Lecture by Gil Hirsch',12)] = 0
     classSchedule[('Product Management - Guest Lecture by Gil Hirsch',9)] = 0
     classSchedule[('Product Management - Guest Lecture by Gil Hirsch',3)] = 30
+    classSchedule[('Fruit Shakes - Mustafa',9)] = 0
+    classSchedule[('Fruit Shakes - Mustafa',3)] = 0
     classSchedule[('Local Girl Goes Global - Guest Lecture by Idit Harel',3)] = 0
+    classSchedule[('Local Girl Goes Global - Guest Lecture by Idit Harel',12)] = 0
     classSchedule[('Creativity - a taste of thinking beyond',3)] = 0
     classSchedule[('Creativity - a taste of thinking beyond',12)] = 0 
     classSchedule[('Creativity - a taste of thinking beyond',9)] = 30
-    assignments = scheduleHelper(students,classSchedule,times)
+
+    '''
+    x=1
+    classSchedule = {("a",1):x,("b",1):x,("c",1):2*x,("d",1):0,("a",2):2*x,("b",2):x,("c",2):0,("d",2):x}
+    students = {str(i):["a","b"] for i in range(x)}
+    students.update({str(i):["c","b"] for i in range(x,2*x)})
+    students.update({str(i):["c","a"] for i in range(2*x,3*x)})
+    students.update({str(i):["a","d"] for i in range(3*x,4*x)})
+    times = [1,2]
+    '''
+    
+    assignments = scheduleHelper(students,classSchedule,times)#,list(students.keys())[0:100])
+    #print(assignments)
+
     print(num_calls)
-    print("+++++++++++++++++++=")
+    print("+++++++++++++++++++++")
     #rint(classSchedule)
     #print([i[0]+","+str(i[1])+": "+str(classSchedule[i]) for i in classSchedule])
     schedule = {}
